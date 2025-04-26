@@ -1,43 +1,69 @@
 import React from 'react';
 import { Repository } from '../types';
+import { Box, Typography, Card, CardContent, Link } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
+import CallSplitIcon from '@mui/icons-material/CallSplit';
+import { useTheme } from '@mui/material/styles';
 
 interface Props {
-    repositories: Repository[];
+  repositories: Repository[];
 }
 
 const RepositoryList: React.FC<Props> = ({ repositories }) => {
-    return (
-        <div style={{ display: 'grid', gap: '1rem' }}>
-            {repositories.map((repo) => (
-                <div
-                    key={repo.id}
-                    style={{
-                        border: '1px solid #ddd',
-                        borderRadius: '8px',
-                        padding: '1rem',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                        transition: 'transform 0.2s',
-                    }}
-                >
-                    <h2 style={{ marginBottom: '0.5rem' }}>
-                        <a
-                            href={repo.html_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: '#0366d6', textDecoration: 'none' }}
-                        >
-                            {repo.name}
-                        </a>
-                    </h2>
-                    {repo.description && <p>{repo.description}</p>}
-                    <p>
-                        ⭐ {repo.stargazers_count} | 🍴 {repo.forks_count}
-                    </p>
-                </div>
-            ))}
-        </div>
-    );
+  const theme = useTheme();
+
+  return (
+    <Box display="grid" gap={3}>
+      {repositories.map((repo) => (
+        <Card
+          key={repo.id}
+          sx={{
+            borderRadius: 2,
+            transition: 'transform 0.2s',
+            '&:hover': {
+              transform: 'scale(1.02)',
+            },
+          }}
+        >
+          <CardContent>
+            <Typography variant="h5" gutterBottom>
+              <Link
+                href={repo.html_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                underline="hover"
+                sx={{ color: theme.palette.text.primary }}
+              >
+                {repo.name}
+              </Link>
+            </Typography>
+
+            {repo.description && (
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                {repo.description}
+              </Typography>
+            )}
+
+            <Box display="flex" alignItems="center" gap={2} mt={1}>
+              <Box display="flex" alignItems="center" gap={0.5}>
+                <StarIcon color="action" fontSize="small" />
+                <Typography variant="body2" color="text.secondary">
+                  {repo.stargazers_count}
+                </Typography>
+              </Box>
+
+              <Box display="flex" alignItems="center" gap={0.5}>
+                <CallSplitIcon color="action" fontSize="small" />
+                <Typography variant="body2" color="text.secondary">
+                  {repo.forks_count}
+                </Typography>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
+  );
 };
 
 export default RepositoryList;
-
