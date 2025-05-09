@@ -7,11 +7,14 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  Button,
+  Box,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import RepositoryList from "@/components/RepositoryList";
 
 export default function HomePage() {
+  const [inputValue, setInputValue] = useState("dariaekg");
   const [query, setQuery] = useState("dariaekg");
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,7 +28,6 @@ export default function HomePage() {
       setError(null);
 
       try {
-        // Пробуем получить пользователя
         const userResponse = await fetch(`https://api.github.com/users/${query}`);
         if (userResponse.ok) {
           const reposResponse = await fetch(`https://api.github.com/users/${query}/repos`);
@@ -33,7 +35,6 @@ export default function HomePage() {
           const reposData = await reposResponse.json();
           setRepositories(reposData);
         } else {
-          // Если пользователь не найден, пробуем искать глобально по названию репозитория
           const searchResponse = await fetch(
             `https://api.github.com/search/repositories?q=${query}+in:name`
           );
@@ -52,27 +53,35 @@ export default function HomePage() {
     fetchData();
   }, [query]);
 
+  const handleSearch = () => {
+    setQuery(inputValue.trim());
+  };
+
   return (
     <main style={{ padding: "1rem" }}>
       <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
         GitHub Repositories Search
       </Typography>
 
-      <TextField
-        label="Search by username or repository name"
-        variant="outlined"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        fullWidth
-        sx={{ marginBottom: 3 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+        <TextField
+          label="Search by username or repository name"
+          variant="outlined"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          fullWidth
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <Button variant="contained" onClick={handleSearch}>
+          Search
+        </Button>
+      </Box>
 
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
