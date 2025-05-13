@@ -1,60 +1,66 @@
+'use client';
+
 import React from 'react';
 import { Repository } from '../types';
-import { Box, Typography, Card, CardContent, Link } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Link,
+} from '@mui/joy';
 import StarIcon from '@mui/icons-material/Star';
 import CallSplitIcon from '@mui/icons-material/CallSplit';
-import { useTheme } from '@mui/material/styles';
 
 interface Props {
   repositories: Repository[];
 }
 
 const RepositoryList: React.FC<Props> = ({ repositories }) => {
-  const theme = useTheme();
-
   return (
     <Box display="grid" gap={3}>
       {repositories.map((repo) => (
         <Card
           key={repo.id}
+          variant="outlined"
           sx={{
-            borderRadius: 2,
+            borderRadius: 'lg',
             transition: 'transform 0.2s',
             '&:hover': {
               transform: 'scale(1.02)',
+              boxShadow: 'lg',
             },
           }}
         >
           <CardContent>
-            <Typography variant="h5" gutterBottom>
+            <Typography level="h4" gutterBottom>
               <Link
                 href={repo.html_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                underline="hover"
-                sx={{ color: theme.palette.text.primary }}
+                overlay
               >
                 {repo.name}
               </Link>
             </Typography>
 
             {repo.description && (
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography level="body-sm" color="neutral" gutterBottom>
                 {repo.description}
               </Typography>
             )}
 
             <Box display="flex" alignItems="center" gap={2} mt={1}>
               <Box display="flex" alignItems="center" gap={0.5}>
-                <StarIcon color="action" fontSize="small" />
-                <Typography variant="body2" color="text.secondary">
+                <StarIcon fontSize="small" />
+                <Typography level="body-sm" color="neutral">
                   {repo.stargazers_count}
                 </Typography>
               </Box>
 
               <Box display="flex" alignItems="center" gap={0.5}>
-                <CallSplitIcon color="action" fontSize="small" />
-                <Typography variant="body2" color="text.secondary">
+                <CallSplitIcon fontSize="small" />
+                <Typography level="body-sm" color="neutral">
                   {repo.forks_count}
                 </Typography>
               </Box>
