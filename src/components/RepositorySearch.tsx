@@ -1,25 +1,146 @@
-import React from 'react';
-import useRepositories from '../hooks/useRepositories';
+import React, { useState, useCallback } from 'react';
+import { useRepositorySearch } from '@/hooks/useRepositorySearch';
+import { Repository } from '@/types';
+import {
+  Typography,
+  CircularProgress,
+  Box,
+  Container,
+  Pagination,
+  Paper,
+  useTheme,
+} from '@mui/material';
+import RepositoryList from './RepositoryList';
+import AppBar from './AppBar';
 
-export default function RepositorySearch({ username }: { username: string }) {
-  const { repositories, loading, error, searchQuery, setSearchQuery } = useRepositories(username);
+export default function RepositorySearch() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const theme = useTheme();
+  const { 
+    repositories, 
+    isLoading, 
+    error, 
+    totalPages,
+    totalCount 
+  } = useRepositorySearch(searchQuery, currentPage);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query.trim());
+    setCurrentPage(1);
+  }, []);
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search repositories"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      <ul>
-        {repositories.map(repo => (
-          <li key={repo.id}>{repo.name}</li>
-        ))}
-      </ul>
-    </div>
+    <Box sx={{ 
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      bgcolor: 'background.default',
+    }}>
+      <AppBar onSearch={handleSearch} />
+      
+      <Container 
+        maxWidth="lg" 
+        sx={{ 
+          flex: 1,
+          py: { xs: 2, sm: 3, md: 4 },
+          px: { xs: 2, sm: 3 },
+        }}
+      >
+        {isLoading && (
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            minHeight: '200px',
+          }}>
+            <CircularProgress />
+          </Box>
+        )}
+        
+        {error && (
+          <Paper 
+            elevation={0}
+            sx={{ 
+              p: 3, 
+              mb: 3,
+              bgcolor: 'error.light',
+              color: 'error.contrastText',
+              borderRadius: 2,
+            }}
+          >
+            <Typography>
+              {error.message}
+            </Typography>
+          </Paper>
+        )}
+
+        {!isLoading && !error && repositories.length === 0 && searchQuery && (
+          <Paper 
+            elevation={0}
+            sx={{ 
+              p: 3, 
+              mb: 3,
+              bgcolor: 'action.hover',
+              borderRadius: 2,
+            }}
+          >
+            <Typography color="text.secondary">
+              No repositories found
+            </Typography>
+          </Paper>
+        )}
+
+        {!isLoading && !error && repositories.length > 0 && (
+          <>
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                mb: 3,
+                px: { xs: 1, sm: 2 },
+              }}
+            >
+              Found {totalCount} repositories
+            </Typography>
+            
+            <Box sx={{ 
+              display: 'grid',
+              gap: 3,
+              px: { xs: 1, sm: 2 },
+            }}>
+              <RepositoryList repositories={repositories} />
+              
+              {totalPages > 1 && (
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  mt: 4,
+                  mb: 2,
+                }}>
+                  <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    size="large"
+                    color="primary"
+                    sx={{
+                      '& .MuiPaginationItem-root': {
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                      },
+                    }}
+                  />
+                </Box>
+              )}
+            </Box>
+          </>
+        )}
+      </Container>
+    </Box>
   );
 }
