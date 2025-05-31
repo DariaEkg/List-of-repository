@@ -4,7 +4,6 @@ import {
   Toolbar,
   InputBase,
   Box,
-  IconButton,
   useTheme,
   alpha,
 } from '@mui/material';
@@ -17,20 +16,16 @@ interface AppBarProps {
 }
 
 export default function AppBar({ onSearch }: AppBarProps) {
-  const [mounted, setMounted] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const theme = useTheme();
   const debouncedSearch = useDebounce(searchValue, 300);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    onSearch(debouncedSearch);
+  }, [debouncedSearch, onSearch]);
 
-  useEffect(() => {
-    if (mounted) {
-      onSearch(debouncedSearch);
-    }
-  }, [debouncedSearch, onSearch, mounted]);
+  const isExpanded = isFocused || searchValue.length > 0;
 
   return (
     <MuiAppBar 
@@ -42,27 +37,27 @@ export default function AppBar({ onSearch }: AppBarProps) {
         borderColor: 'divider',
       }}
     >
-      <Toolbar sx={{ px: { xs: 2, sm: 3 } }}>
+      <Toolbar disableGutters sx={{ minHeight: '64px', position: 'relative' }}>
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center',
-          gap: 2,
-          flex: 1,
-          maxWidth: 'lg',
-          mx: 'auto',
           width: '100%',
+          position: 'relative',
         }}>
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center',
-            gap: 1,
             color: 'text.primary',
+            pl: 1,
+            flexShrink: 0,
+            width: '200px',
           }}>
             <GitHubIcon sx={{ fontSize: 28 }} />
             <Box sx={{ 
               typography: 'h6',
               fontWeight: 600,
               display: { xs: 'none', sm: 'block' },
+              ml: 1,
             }}>
               GitHub Search
             </Box>
@@ -70,10 +65,12 @@ export default function AppBar({ onSearch }: AppBarProps) {
 
           <Box
             sx={{
-              position: 'relative',
-              flex: 1,
-              maxWidth: 600,
-              mx: 'auto',
+              position: 'absolute',
+              right: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: isExpanded ? 'calc(100% - 200px)' : '30%',
+              transition: 'width 0.3s ease-in-out',
             }}
           >
             <Box
@@ -84,8 +81,9 @@ export default function AppBar({ onSearch }: AppBarProps) {
                 borderRadius: 2,
                 px: 2,
                 py: 1,
-                transition: 'all 0.2s',
-                '&:hover, &:focus-within': {
+                width: '100%',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
                   bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
                 },
               }}
@@ -95,15 +93,19 @@ export default function AppBar({ onSearch }: AppBarProps) {
                   color: 'text.secondary',
                   mr: 1,
                   fontSize: 20,
+                  flexShrink: 0,
                 }} 
               />
               <InputBase
                 placeholder="Search repositories..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
                 sx={{
                   flex: 1,
                   color: 'text.primary',
+                  minWidth: 0,
                   '& .MuiInputBase-input': {
                     py: 1,
                     px: 1,

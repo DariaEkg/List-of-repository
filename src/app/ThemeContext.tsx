@@ -1,43 +1,35 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import getDesignTokens from './theme';
 
 type ThemeMode = 'light' | 'dark';
 
-// Определяем тему на основе системных настроек
-const getSystemTheme = (): ThemeMode => {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-};
-
-const ThemeContext = createContext<ThemeMode>('light');
+const ThemeContext = createContext<{
+  mode: ThemeMode;
+  setMode: (mode: ThemeMode) => void;
+}>({
+  mode: 'light',
+  setMode: () => {},
+});
 
 export const useTheme = () => useContext(ThemeContext);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>('light');
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [mode, setMode] = React.useState<ThemeMode>(prefersDarkMode ? 'dark' : 'light');
 
-  useEffect(() => {
-    // Устанавливаем начальную тему
-    setMode(getSystemTheme());
+  React.useEffect(() => {
+    setMode(prefersDarkMode ? 'dark' : 'light');
+  }, [prefersDarkMode]);
 
-    // Слушаем изменения системной темы
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      setMode(e.matches ? 'dark' : 'light');
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  const theme = createTheme(getDesignTokens(mode));
+  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   return (
-    <ThemeContext.Provider value={mode}>
+    <ThemeContext.Provider value={{ mode, setMode }}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}
