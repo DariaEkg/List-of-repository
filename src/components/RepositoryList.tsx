@@ -6,7 +6,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
   ListItemAvatar,
   Avatar,
   Typography,
@@ -51,37 +50,35 @@ const RepositoryList: React.FC<Props> = ({ repositories }) => {
                   {repo.name}
                 </MuiLink>
               }
-              secondary={
-                <Box component="div">
-                  {repo.description && (
-                    <Typography
-                      component="div"
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
-                    >
-                      {repo.description}
-                    </Typography>
-                  )}
-
-                  <Box component="div" sx={{ display: 'flex', gap: 2 }}>
-                    <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <StarIcon fontSize="small" color="action" />
-                      <Typography component="span" variant="body2" color="text.secondary">
-                        {repo.stargazers_count}
-                      </Typography>
-                    </Box>
-
-                    <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <CallSplitIcon fontSize="small" color="action" />
-                      <Typography component="span" variant="body2" color="text.secondary">
-                        {repo.forks_count}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-              }
             />
+            <Box sx={{ ml: 2, flex: 1 }}>
+              {repo.description && (
+                <Typography
+                  component="div"
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
+                  {repo.description}
+                </Typography>
+              )}
+
+              <Box component="div" sx={{ display: 'flex', gap: 2 }}>
+                <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <StarIcon fontSize="small" color="action" />
+                  <Typography component="span" variant="body2" color="text.secondary">
+                    {repo.stargazers_count}
+                  </Typography>
+                </Box>
+
+                <Box component="div" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <CallSplitIcon fontSize="small" color="action" />
+                  <Typography component="span" variant="body2" color="text.secondary">
+                    {repo.forks_count}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
           </ListItem>
           <Divider component="li" />
         </React.Fragment>

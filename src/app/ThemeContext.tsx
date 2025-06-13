@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import getDesignTokens from './theme';
 
@@ -19,12 +18,7 @@ const ThemeContext = createContext<{
 export const useTheme = () => useContext(ThemeContext);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [mode, setMode] = React.useState<ThemeMode>(prefersDarkMode ? 'dark' : 'light');
-
-  React.useEffect(() => {
-    setMode(prefersDarkMode ? 'dark' : 'light');
-  }, [prefersDarkMode]);
+  const [mode, setMode] = React.useState<ThemeMode>('dark');
 
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 

@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback } from 'react';
 import { useRepositorySearch } from '@/hooks/useRepositorySearch';
-import { Repository } from '@/types';
 import {
   Typography,
   CircularProgress,
@@ -10,7 +9,6 @@ import {
   Container,
   Pagination,
   Paper,
-  useTheme,
 } from '@mui/material';
 import RepositoryList from './RepositoryList';
 import AppBar from './AppBar';
@@ -18,7 +16,6 @@ import AppBar from './AppBar';
 export default function RepositorySearch() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const theme = useTheme();
   const { 
     repositories, 
     isLoading, 
@@ -43,6 +40,7 @@ export default function RepositorySearch() {
       display: 'flex',
       flexDirection: 'column',
       bgcolor: 'background.default',
+      pt: '80px',
     }}>
       <AppBar onSearch={handleSearch} />
       

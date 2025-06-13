@@ -14,6 +14,32 @@ const fetcher = (url: string) => fetch(url).then(res => {
 });
 
 export function useRepositorySearch(query: string, page: number = 1) {
+  const shouldFetch = query.length > 0 && typeof window !== 'undefined';
+
+  const { data, error, isLoading } = useSWR<SearchResponse>(
+    shouldFetch 
+      ? `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}+in:name&page=${page}&per_page=${ITEMS_PER_PAGE}` 
+      : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 5000,
+    }
+  );
+
+  const totalPages = data ? Math.ceil(data.total_count / ITEMS_PER_PAGE) : 0;
+
+  return {
+    repositories: data?.items ?? [],
+    isLoading,
+    error: error as Error | undefined,
+    totalPages,
+    currentPage: page,
+    totalCount: data?.total_count ?? 0,
+  };
+}
+
+/*export function useRepositorySearch(query: string, page: number = 1) {
   const shouldFetch = query.length > 0;
   
   const { data, error, isLoading } = useSWR<SearchResponse>(
@@ -37,4 +63,4 @@ export function useRepositorySearch(query: string, page: number = 1) {
     currentPage: page,
     totalCount: data?.total_count ?? 0,
   };
-} 
+}  */
